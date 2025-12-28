@@ -1,0 +1,1 @@
+Al ejecutar timerly.sh más de una vez, mantiene solo una instancia activa. Actualiza este script para que permita ejecutar siempre las apps del parámetro --apps todas las veces que timerly.sh sea llamado.
