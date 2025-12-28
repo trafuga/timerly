@@ -314,6 +314,8 @@ timerly --help
 
 Este es el caso de uso original para el que fue diseñado Timerly: **gestionar turnos justos en equipos compartidos**, especialmente entre hermanos o hijos.
 
+📖 **Guía Completa**: Consulta [GUIA_TURNOS_FAMILIAS.md](GUIA_TURNOS_FAMILIAS.md) para una explicación detallada con diagramas, escenarios reales y mejores prácticas.
+
 ### 🎮 Flujo Típico de Turnos
 
 La idea es simple pero poderosa:
