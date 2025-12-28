@@ -1,16 +1,28 @@
-# Timerly
+# 👨‍👩‍👧‍👦 Timerly - Gestor de Turnos y Tiempo de Pantalla
 
-Un script de Bash avanzado para Linux que proporciona un sistema completo de temporizadores con alertas visuales y sonoras, gestión de aplicaciones y estadísticas detalladas. Ideal para técnicas de productividad (Pomodoro), ejercicio, pausas programadas y más.
+Un script de Bash avanzado para Linux que proporciona un sistema completo de temporizadores con alertas visuales y sonoras, gestión de aplicaciones y estadísticas detalladas.
+
+**Diseño original y caso de uso principal**: Control equitativo del tiempo de pantalla en equipos compartidos (ideal para familias con múltiples hijos). Las pausas intermedias permiten que cada hijo tenga turnos justos en el computador.
+
+**Otros usos**: Técnicas de productividad (Pomodoro), sesiones de ejercicio, pausas programadas, gaming, desarrollo de software, etc.
 
 ## 🌟 Características Principales
+
+### 👨‍👩‍👧‍👦 Para Control Familiar
+
+- **👥 Turnos Equitativos**: Sistema ideal para gestionar múltiples "rondas" de uso en equipos compartidos
+- **⏰ Alertas de Cambio**: Notificaciones claras indicando cuándo cambiar de usuario/turno
+- **📊 Estadísticas de Uso**: Registra exactamente cuánto tiempo cada aplicación/sesión se ejecutó
+- **🎬 Mensajes Personalizados**: Diferentes mensajes para cada turno o fase (cambio, fin, etc.)
+
+### ⚙️ Técnicas
 
 - **⏰ Timer único y persistente**: Solo una instancia activa de timer por sesión para evitar conflictos. Permite agregar nuevas aplicaciones sin reiniciar.
 - **⏱️ Soporte completo de tiempo**: Funciona con segundos y minutos con validación y conversión automática.
 - **🎯 Alertas inteligentes**: Notificaciones visuales (Zenity/Notify-send) + alertas sonoras con fallback a terminal.
 - **📱 Gestión de aplicaciones**: Abre múltiples aplicaciones simultáneamente y monitorea su ciclo de vida.
 - **⚙️ Sistema flexible de configuración**: Soporta configuración por defecto, templates predefinidos y configuraciones personalizadas.
-- **⚡ Sintaxis simplificada**: Ejecuta configuraciones con `timerly pomodoro` en lugar de parámetros complejos.
-- **🎬 Mensajes diferenciados**: Soporta mensaje normal para alertas intermedias y mensaje final opcional para la última alerta.
+- **⚡ Sintaxis simplificada**: Ejecuta configuraciones con `timerly pomodoro` o `timerly turnos_hermanos` en lugar de parámetros complejos.
 - **📊 Estadísticas acumuladas**: Seguimiento de timers creados, apps ejecutadas, alertas mostradas y tiempo total.
 - **📝 Logs detallados con timestamps**: Registro completo en `~/timerly.log` (se limpia automáticamente cada día).
 - **🧹 Limpieza automática**: Gestión inteligente de archivos temporales y logs diarios.
@@ -63,14 +75,17 @@ sudo apt install mpv
 Clona este repositorio o descarga los siguientes archivos manteniendo la estructura:
 ```
 timer/
-├── timerly.sh              # Script principal
-├── app_wrapper.sh          # Wrapper para monitoreo de apps
-├── timer_defaults.conf     # Configuración por defecto
-├── templates/              # Carpeta con configuraciones predefinidas
-│   ├── pomodoro.conf
-│   ├── gaming.conf
-│   └── test.conf
-└── notifications.wav       # Archivo de sonido (opcional pero recomendado)
+├── timerly.sh                      # Script principal
+├── app_wrapper.sh                  # Wrapper para monitoreo de apps
+├── timer_defaults.conf             # Configuración por defecto
+├── notifications.wav               # Archivo de sonido (opcional pero recomendado)
+└── templates/                      # Carpeta con configuraciones predefinidas
+    ├── pomodoro.conf               # Técnica Pomodoro
+    ├── gaming.conf                 # Gaming genérico
+    ├── test.conf                   # Para pruebas
+    ├── turnos_hermanos.conf        # Control de turnos entre hermanos
+    ├── ninos_pequeños.conf         # Para niños pequeños
+    └── gaming_adolescentes.conf    # Gaming para adolescentes
 ```
 
 ### Paso 2: Permisos de ejecución
@@ -175,19 +190,28 @@ Son archivos `.conf` guardados en la carpeta `templates/` con configuraciones pr
 ```
 timer/
 └── templates/
-    ├── pomodoro.conf       # Técnica Pomodoro (25m x4)
-    ├── gaming.conf         # Sesiones de gaming (45m x2)
-    ├── test.conf           # Para pruebas rápidas
-    └── tu_config.conf      # Tus propias configuraciones
+    ├── pomodoro.conf              # Técnica Pomodoro (25m x4)
+    ├── gaming.conf                # Sesiones de gaming (45m x2)
+    ├── test.conf                  # Para pruebas rápidas
+    ├── turnos_hermanos.conf       # Control de turnos (45m x3)
+    ├── ninos_pequeños.conf        # Para niños pequeños (20m x2)
+    ├── gaming_adolescentes.conf   # Gaming para adolescentes (60m x2)
+    └── tu_config.conf             # Tus propias configuraciones
 ```
 
 **Usar un template:**
 ```bash
-# Sintaxis simplificada
+# Sintaxis simplificada - Productividad
 ./timerly.sh pomodoro
+
+# Templates para control de tiempo infantil
+./timerly.sh turnos_hermanos           # 45m x3 turnos
+./timerly.sh ninos_pequeños            # 20m x2 turnos (más cortos)
+./timerly.sh gaming_adolescentes       # 60m x2 turnos (gaming intenso)
 
 # Con parámetros que sobrescriben el template
 ./timerly.sh pomodoro -m "Pomodoro intensivo"
+./timerly.sh turnos_hermanos -m "⏰ Le toca a Diego"
 ./timerly.sh gaming -a "discord,spotify"
 ```
 
@@ -284,6 +308,141 @@ timerly --config ./config_personal.conf
 # Ayuda completa
 timerly -h
 timerly --help
+```
+
+## 👨‍👩‍👧‍👦 Control de Tiempo de Pantalla - Turnos Equitativos
+
+Este es el caso de uso original para el que fue diseñado Timerly: **gestionar turnos justos en equipos compartidos**, especialmente entre hermanos o hijos.
+
+### 🎮 Flujo Típico de Turnos
+
+La idea es simple pero poderosa:
+1. **Sesión de juego/ocio**: Tiempo configurable (ej: 45 minutos)
+2. **Alerta de pausa**: Se muestra una notificación indicando que es "hora de cambiar"
+3. **Descanso/Cambio de turno**: Tiempo para que se desconecte y otro hijo inicie (ej: 5 minutos)
+4. **Repetir**: Se puede configurar para múltiples turnos
+
+### 📝 Ejemplos de Configuración para Niños
+
+#### Opción 1: Turnos de Gaming con Descansos
+
+**Configuración ideal** para 2-3 hijos compartiendo un computador:
+```bash
+# Turno de 45 minutos, con 3 rondas
+timerly -t 45 -u m -r 3 -m "⏰ ¡Cambio de turno! Cede el computador a tu hermano" \
+              -f "🏁 ¡Fin de la sesión de gaming!" -a "steam,lutris"
+
+# Resultado:
+# - Cada hijo juega 45 minutos
+# - Alertas cada 45 minutos indicando cambio de turno
+# - 3 rondas = 2 horas 15 minutos total (ideal para una tarde)
+```
+
+#### Opción 2: Turnos Cortos con Pausas Frecuentes
+
+**Para niños más pequeños** (menos tolerancia a esperas largas):
+```bash
+# Turnos de 30 minutos, 2 rondas, pausas cortas
+timerly -t 30 -u m -r 2 -m "⏸️ Pausa de 10 minutos - ¡Cambio de turno!" \
+              -f "🏁 ¡Se acabó el tiempo!" -a "minecraft,roblox"
+```
+
+#### Opción 3: Sistema de Turnos Rotativo Rápido
+
+**Para máxima equidad** (turnos muy frecuentes):
+```bash
+# Turnos de 20 minutos, 4 rondas (ideal para 3-4 hijos)
+timerly -t 20 -u m -r 4 -m "🔔 ¡Cambio de turno!" \
+              -f "✅ ¡Sesión completada!" -a "steam,firefox"
+```
+
+### 🎬 Template Recomendado: Turnos Escolares
+
+Crea un archivo `templates/turnos_hermanos.conf`:
+```bash
+# Configuración para turnos entre hermanos
+DEFAULT_TIMER_VALUE="45"           # 45 minutos por turno
+DEFAULT_TIME_UNIT="m"
+DEFAULT_REPEAT_COUNT="3"           # 3 hermanos = 3 turnos
+DEFAULT_ALERT_MESSAGE="⏰ ¡CAMBIO DE TURNO! El próximo hermano puede conectarse"
+DEFAULT_FINAL_MESSAGE="✅ ¡Fin de la sesión de hoy! Todos tuvieron tiempo equitativo"
+DEFAULT_APPS_STRING="steam,firefox,minecraft"  # Apps principales
+DEFAULT_NOTIFICATION_TIMEOUT="20"
+```
+
+Úsalo así:
+```bash
+# Lanzar turnos de hoy
+timerly turnos_hermanos
+
+# O personalizar en el momento
+timerly turnos_hermanos -m "⏰ Cambio de turno - le toca a María"
+```
+
+### 📊 Monitoreo de Turnos
+
+**Ver estado actual** (quién está jugando y cuándo cambia):
+```bash
+timerly -s
+```
+
+Muestra:
+```
+🟢 Timer ACTIVO (PID: 12345)
+   ⏱️  Intervalo: 45m
+   🔁 Repeticiones: 3
+   💬 Mensaje: '⏰ ¡CAMBIO DE TURNO! El próximo hermano puede conectarse'
+   📅 Iniciado: Hoy 16:30:00
+   📱 Aplicaciones activas:
+      • steam
+      • minecraft
+```
+
+### 🛑 Deteniendo un Turno
+
+Si necesitas interrumpir (ej: almuerzo imprevisto):
+```bash
+timerly -k  # Detiene el timer inmediatamente
+```
+
+### 📈 Ver Estadísticas de Uso
+
+Después de varias sesiones, puedes analizar cuánto tiempo cada app se ejecutó:
+```bash
+timerly --stats
+```
+
+Muestra estadísticas como:
+```
+✅ PID:1234 | steam | 12-28 16:30:15 → 17:15:45 | 45:30m
+✅ PID:1235 | minecraft | 12-28 17:20:10 → 18:05:20 | 45:10m
+✅ PID:1236 | steam | 12-28 18:10:15 → 18:55:30 | 45:15m
+
+📱 Aplicaciones ejecutadas: 3
+⏱️  Tiempo total ejecutado: 135:55m
+```
+
+### 💡 Tips para Padres/Madres
+
+1. **Ser consistente**: Usa el mismo horario y duración todos los días
+2. **Avisos claros**: Los mensajes de alerta deben ser claros y no ambiguos
+3. **Aplicaciones monitoreadas**: Incluye las apps que quieres que cierren (Steam, navegadores, etc.)
+4. **Estadísticas regulares**: Revisa `timerly --stats` para validar que se respeta el tiempo
+5. **Pausas justas**: Agrega tiempo extra en las pausas si los hijos necesitan guardar progreso
+
+### 🎯 Escenario Real: Casa con 3 Hijos
+
+Configuración que funciona bien:
+
+```bash
+# Mañana: 1 hora de estudio/tareas
+timerly -t 60 -u m -r 1 -m "📚 Se acabó el tiempo de estudio" -a "firefox,libreoffice"
+
+# Tarde: 3 turnos de 30 minutos para gaming
+timerly -t 30 -u m -r 3 -m "🎮 ¡Cambio de turno!" -f "✅ Todos jugaron" -a "steam,minecraft"
+
+# Noche: Máximo 1 hora antes de dormir
+timerly -t 60 -u m -r 1 -m "⏰ A dormir, cierra todo" -a "firefox"
 ```
 
 ## 📊 Monitoreo y Estadísticas
