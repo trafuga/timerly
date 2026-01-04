@@ -245,19 +245,15 @@ convert_to_seconds() {
     esac
 }
 
-# Función para formatear tiempo para mostrar
+# Función para formatear tiempo para mostrar (HH:MM:SS)
 format_time_display() {
     local seconds="$1"
-    
-    if [ "$seconds" -lt 60 ]; then
-        echo "${seconds}s"
-    elif [ "$seconds" -eq 60 ]; then
-        echo "1m"
-    elif [ $((seconds % 60)) -eq 0 ]; then
-        echo "$((seconds / 60))m"
-    else
-        echo "$((seconds / 60))m ${seconds % 60}s"
-    fi
+
+    local hours=$((seconds / 3600))
+    local minutes=$(((seconds % 3600) / 60))
+    local secs=$((seconds % 60))
+
+    printf "%02d:%02d:%02d" $hours $minutes $secs
 }
 
 # Función para calcular tiempo restante
@@ -575,14 +571,15 @@ show_stats() {
         # Mostrar separador y total
         echo "╠════════════════════════════════════════════════════════════════════════════════════╣"
 
-        # Convertir total de segundos a MM:SS
-        local total_minutes=$((total_seconds / 60))
+        # Convertir total de segundos a HH:MM:SS
+        local total_hours=$((total_seconds / 3600))
+        local total_minutes=$(((total_seconds % 3600) / 60))
         local total_secs=$((total_seconds % 60))
-        local total_formatted=$(printf "%d:%02d" $total_minutes $total_secs)
+        local total_formatted=$(printf "%02d:%02d:%02d" $total_hours $total_minutes $total_secs)
 
         echo "║                                                                                    ║"
         echo "║  📱 Aplicaciones ejecutadas: $app_count                                           "
-        echo "║  ⏱️  Tiempo total ejecutado: ${total_formatted}m                                      "
+        echo "║  ⏱️  Tiempo total ejecutado: ${total_formatted}                                       "
         echo "║                                                                                    ║"
         echo "╚════════════════════════════════════════════════════════════════════════════════════╝"
     else
@@ -618,14 +615,7 @@ reset_stats() {
     local total_minutes=$(((STATS_TOTAL_DURATION % 3600) / 60))
     local total_secs=$((STATS_TOTAL_DURATION % 60))
 
-    local duration_formatted=""
-    if [ $total_hours -gt 0 ]; then
-        duration_formatted="${total_hours}h ${total_minutes}m ${total_secs}s"
-    elif [ $total_minutes -gt 0 ]; then
-        duration_formatted="${total_minutes}m ${total_secs}s"
-    else
-        duration_formatted="${total_secs}s"
-    fi
+    local duration_formatted=$(printf "%02d:%02d:%02d" $total_hours $total_minutes $total_secs)
 
     echo "   Fecha: $STATS_CREATED_DATE"
     echo "   Tiempo activo: ${uptime_days}d ${uptime_hours}h ${uptime_minutes}m"
@@ -1042,9 +1032,12 @@ done
 DAEMON_END_EPOCH=\$(date +%s)
 DAEMON_DURATION=\$((DAEMON_END_EPOCH - DAEMON_START_EPOCH))
 
-DAEMON_MINUTES=\$(echo \"scale=1; \$DAEMON_DURATION / 60\" | bc)
+DAEMON_HOURS=\$((DAEMON_DURATION / 3600))
+DAEMON_MINUTES=\$(((DAEMON_DURATION % 3600) / 60))
+DAEMON_SECS=\$((DAEMON_DURATION % 60))
+DAEMON_TIME_FORMATTED=\$(printf \"%02d:%02d:%02d\" \$DAEMON_HOURS \$DAEMON_MINUTES \$DAEMON_SECS)
 
-log_message \"✅ Timer | \$repeat_count alertas | \${DAEMON_MINUTES}m\"
+log_message \"✅ Timer | \$repeat_count alertas | \${DAEMON_TIME_FORMATTED}\"
 
 cleanup_timer
 " > /dev/null 2>&1 &
